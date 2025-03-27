@@ -9,6 +9,9 @@ public class TransactionDto {
     private BigDecimal amount;
     private TransactionType type;
 
+    public TransactionDto() {
+    }
+
     public TransactionDto(String accountId, String transactionId, BigDecimal amount, TransactionType transactionType) {
         this.accountId = accountId;
         this.transactionId = transactionId;
