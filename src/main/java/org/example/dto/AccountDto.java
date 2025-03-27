@@ -3,14 +3,18 @@ package org.example.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import org.example.model.Transaction;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 public class AccountDto {
-    private final String accountId;
-    private final String email;
-    private final List<Transaction> transactions;
+    private String accountId;
+    private String email;
+    private List<Transaction> transactions = new ArrayList<>();
+
+    public AccountDto() {
+    }
 
     @JsonCreator
     public AccountDto(String accountId, String email, List<Transaction> transactions) {
