@@ -1,12 +1,17 @@
 package org.example.dto;
 
+import jakarta.validation.constraints.NotNull;
+
 import java.math.BigDecimal;
 import java.util.Objects;
 
 public class TransactionDto {
+    @NotNull
     private String accountId;
     private String transactionId;
+    @NotNull
     private BigDecimal amount;
+    @NotNull
     private TransactionType type;
 
     public TransactionDto() {
