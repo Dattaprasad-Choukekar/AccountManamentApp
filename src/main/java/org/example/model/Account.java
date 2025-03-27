@@ -15,7 +15,7 @@ public class Account {
     @Column(unique = true)
     private String email;
     @OneToMany(mappedBy = "account")
-    private List<Transaction> transactions = new ArrayList<>();
+    private List<Transaction> transactions;
 
     public Account() {
     }
@@ -47,5 +47,9 @@ public class Account {
 
     public List<Transaction> getTransactions() {
         return transactions;
+    }
+
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
     }
 }

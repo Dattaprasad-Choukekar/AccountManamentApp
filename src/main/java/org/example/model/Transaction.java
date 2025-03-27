@@ -16,8 +16,8 @@ public class Transaction {
     @Id
     @GeneratedValue
     private Long id;
-    @ManyToOne
     @NotNull
+    @ManyToOne
     private Account account;
     @Column(unique = true)
     private String transactionId;

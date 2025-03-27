@@ -16,19 +16,19 @@ public class AccountDto {
     @NotBlank
     @Email
     private String email;
-    private List<Transaction> transactions = new ArrayList<>();
+    private List<TransactionDto> transactions = new ArrayList<>();
 
     public AccountDto() {
     }
 
     @JsonCreator
-    public AccountDto(String accountId, String email, List<Transaction> transactions) {
+    public AccountDto(String accountId, String email, List<TransactionDto> transactions) {
         this.accountId = accountId;
         this.email = email;
-        this.transactions = transactions;
+        this.transactions = transactions == null ? new ArrayList<>() : transactions;
     }
 
-    public AccountDto(String email, List<Transaction> transactions) {
+    public AccountDto(String email, List<TransactionDto> transactions) {
         this(null, email, transactions);
     }
 
@@ -36,7 +36,7 @@ public class AccountDto {
         return accountId;
     }
 
-    public List<Transaction> getTransactions() {
+    public List<TransactionDto> getTransactions() {
         return Collections.unmodifiableList(transactions);
     }
 

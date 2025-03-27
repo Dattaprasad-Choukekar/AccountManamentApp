@@ -28,7 +28,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountDto getAccount(String accountId) {
-        Optional<Account> accountOpt = accountRepository.findByAccountId(accountId);
+        Optional<Account> accountOpt = accountRepository.findByAccountId(accountId);;
         Account account = accountOpt.orElseThrow(AccountNotFoundException::new);
         return toAccountDto(account);
     }

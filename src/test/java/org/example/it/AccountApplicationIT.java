@@ -66,7 +66,7 @@ public class AccountApplicationIT {
         mockMvc.perform(MockMvcRequestBuilders.post("/accounts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"email":"test@email.com","transactions":[]}
+                                {"email":"test@email.com"}
                                 """))
                 .andDo(print())
                 .andExpect(status().isCreated())
