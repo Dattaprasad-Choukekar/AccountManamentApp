@@ -3,6 +3,7 @@ package org.example.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -17,7 +18,8 @@ public class Transaction {
     @Id
     @GeneratedValue
     private Long id;
-    private String accountId;
+    @ManyToOne
+    private Account account;
     private String transactionId;
     private BigDecimal amount;
     private TransactionType type;
@@ -25,15 +27,12 @@ public class Transaction {
     public Transaction() {
     }
 
-    public Transaction(String accountId, String transactionId, BigDecimal amount, TransactionType transactionType) {
-        this.accountId = accountId;
+    public Transaction(Account account, String transactionId, BigDecimal amount,
+                       TransactionType transactionType) {
+        this.account = account;
         this.transactionId = transactionId;
         this.amount = amount;
         this.type = transactionType;
-    }
-
-    public String getAccountId() {
-        return accountId;
     }
 
     public BigDecimal getAmount() {
@@ -48,10 +47,6 @@ public class Transaction {
         return transactionId;
     }
 
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
-    }
-
     public void setTransactionId(String transactionId) {
         this.transactionId = transactionId;
     }
@@ -64,16 +59,24 @@ public class Transaction {
         this.type = type;
     }
 
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Transaction that = (Transaction) o;
-        return Objects.equals(id, that.id) && Objects.equals(accountId, that.accountId) && Objects.equals(transactionId, that.transactionId) && Objects.equals(amount, that.amount) && type == that.type;
+        return Objects.equals(id, that.id) && Objects.equals(account, that.account) && Objects.equals(transactionId, that.transactionId) && Objects.equals(amount, that.amount) && type == that.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, accountId, transactionId, amount, type);
+        return Objects.hash(id, account, transactionId, amount, type);
     }
 }
 

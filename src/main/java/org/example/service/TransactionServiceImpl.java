@@ -8,7 +8,9 @@ import org.example.model.Transaction;
 import org.example.repository.AccountRepository;
 import org.example.repository.TransactionRepository;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
 import org.modelmapper.config.Configuration;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,9 +34,13 @@ public class TransactionServiceImpl implements TransactionService {
     private void init() {
         mapper.getConfiguration().setFieldMatchingEnabled(true)
                 .setFieldAccessLevel(Configuration.AccessLevel.PRIVATE)
-                .setAmbiguityIgnored(true);
+                .setAmbiguityIgnored(true)
+                .setMatchingStrategy(MatchingStrategies.STRICT);
 
-
+        TypeMap<Transaction, TransactionDto> accountIdMapper = mapper.createTypeMap(Transaction.class, TransactionDto.class);
+        accountIdMapper.addMappings(mapper
+                -> mapper.map(t -> t.getAccount().getAccountId(), TransactionDto::setAccountId)
+        );
     }
 
     @Override
@@ -48,7 +54,7 @@ public class TransactionServiceImpl implements TransactionService {
         if (!accountRepository.existsByAccountId(accountId)) {
             throw new AccountNotFoundException("Account with does not exist: " + accountId);
         }
-        List<Transaction> transactions = transactionRepository.findByAccountId(accountId);
+        List<Transaction> transactions = transactionRepository.findByAccount_accountId(accountId);
         return transactions.stream().map(this::toTransactionDto).collect(Collectors.toList());
     }
 
@@ -58,6 +64,7 @@ public class TransactionServiceImpl implements TransactionService {
             throw new AccountNotFoundException("Account with does not exist: " + transactionDto.getAccountId());
         }
         Transaction transactionToSave = mapper.map(transactionDto, Transaction.class);
+        transactionToSave.setAccount(accountRepository.getReferenceByAccountId(transactionDto.getAccountId()));
         transactionToSave.setTransactionId(UUID.randomUUID().toString());
 
         return toTransactionDto(transactionRepository.save(transactionToSave));

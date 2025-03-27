@@ -35,6 +35,10 @@ public class TransactionDto {
         return transactionId;
     }
 
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface AccountRepository extends CrudRepository<Account, Long> {
     Optional<Account> findByAccountId(String accountId);
     boolean existsByAccountId(String accountId);
+    Account getReferenceByAccountId(String accountId);
 }
