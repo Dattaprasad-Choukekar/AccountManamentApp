@@ -1,22 +1,37 @@
 package org.example.controller;
 
-import org.example.model.Transaction;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
+import org.example.dto.TransactionDto;
+import org.example.service.TransactionService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController("/transactions/")
+@RestController
+@RequestMapping("/transactions")
 public class TransactionController {
 
-    @GetMapping("{id}")
-    public Transaction getTransaction(@PathVariable int id) {
-        return null;
+    private TransactionService transactionService;
+
+    public TransactionController(TransactionService transactionService) {
+        this.transactionService = transactionService;
     }
 
-   /* @GetMapping("{accountId}")
-    public List<Transaction> getTransactions(@PathVariable int accountId) {
-        return null;
-    }*/
+    @GetMapping("/{transactionId}")
+    public TransactionDto getTransaction(@PathVariable String transactionId) {
+        return transactionService.getTransaction(transactionId);
+    }
+
+    @PostMapping
+    public ResponseEntity<TransactionDto> createTransaction(@Valid @RequestBody TransactionDto transactionDto) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(transactionService.createTransaction(transactionDto));
+    }
+
+    @GetMapping()
+    public List<TransactionDto> getTransactions(@RequestParam String accountId) {
+        return transactionService.getTransactionsByAccountId(accountId);
+    }
 }
