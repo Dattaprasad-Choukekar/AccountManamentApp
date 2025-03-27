@@ -2,6 +2,8 @@ package org.example.controller;
 
 import org.example.dto.TransactionDto;
 import org.example.dto.TransactionType;
+import org.example.exception.AccountNotFoundException;
+import org.example.exception.TransactionNotFoundException;
 import org.example.service.TransactionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,5 +88,15 @@ class TransactionControllerTest {
                 .andExpect(jsonPath("$[0].transactionId", is(TRANSACTION_ID)))
                 .andExpect(jsonPath("$[0].amount", is(transactionDto.getAmount().intValue())))
                 .andExpect(jsonPath("$[0].type", is(transactionDto.getType().toString())));
+    }
+
+    @Test
+    void transactionNotFoundExceptionTest() throws Exception {
+        String transactionNotFound = "999";
+        when(transactionService.getTransaction(eq(transactionNotFound))).thenThrow(new TransactionNotFoundException());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/transactions/{ID}", transactionNotFound))
+                //.andDo(print())
+                .andExpect(status().isNotFound());
     }
 }

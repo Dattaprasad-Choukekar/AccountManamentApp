@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import org.example.dto.AccountDto;
+import org.example.exception.AccountNotFoundException;
 import org.example.service.AccountService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,5 +88,15 @@ class AccountControllerTest {
                                 """))
                // .andDo(print())
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void accountNotFoundExceptionTest() throws Exception {
+        String accountIdNotFound = "999";
+        when(accountService.getAccount(eq(accountIdNotFound))).thenThrow(new AccountNotFoundException());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/accounts/{ID}", accountIdNotFound))
+                //.andDo(print())
+                .andExpect(status().isNotFound());
     }
 }
