@@ -20,6 +20,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(AccountController.class)
 class AccountControllerTest {
+    private static final String EMAIL = "test@email.com";
+    private static final String ID = "1234";
 
     @MockitoBean
     private AccountService accountService;
@@ -29,22 +31,22 @@ class AccountControllerTest {
 
     @Test
     void getAccountTest() throws Exception {
-        String id = "1234";
-        AccountDto account = new AccountDto(id, List.of());
-        when(accountService.getAccount(eq(id))).thenReturn(account);
+        AccountDto account = new AccountDto(ID, EMAIL, List.of());
+        when(accountService.getAccount(eq(ID))).thenReturn(account);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/accounts/{id}", id))
+        mockMvc.perform(MockMvcRequestBuilders.get("/accounts/{ID}", ID))
                 //.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.accountId", is(id)))
+                .andExpect(jsonPath("$.accountId", is(ID)))
+                .andExpect(jsonPath("$.email", is(EMAIL)))
                 .andExpect(jsonPath("$.transactions", empty()));
     }
 
     @Test
     void getAccountsTest() throws Exception {
-        String id = "1234";
-        when(accountService.getAccounts()).thenReturn(List.of(new AccountDto(id, List.of())));
+        when(accountService.getAccounts()).thenReturn(List.of(new AccountDto(ID,
+                EMAIL, List.of())));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/accounts"))
                 .andDo(print())
@@ -52,25 +54,27 @@ class AccountControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].accountId", is(id)))
+                .andExpect(jsonPath("$[0].accountId", is(ID)))
+                .andExpect(jsonPath("$[0].email", is(EMAIL)))
                 .andExpect(jsonPath("$[0].transactions", empty()));
     }
 
     @Test
     void createAccountTest() throws Exception {
-        String id = "1234";
-        AccountDto account = new AccountDto(null, List.of());
-        when(accountService.createAccount(eq(account))).thenReturn(new AccountDto(id, List.of()));
+        AccountDto account = new AccountDto(EMAIL, List.of());
+        when(accountService.createAccount(eq(account))).thenReturn(new AccountDto(ID, EMAIL,
+                List.of()));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/accounts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"accountId":null,"transactions":[]}
+                                {"email":"test@email.com","transactions":[]}
                                 """))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.accountId", is(id)))
+                .andExpect(jsonPath("$.accountId", is(ID)))
+                .andExpect(jsonPath("$.email", is(EMAIL)))
                 .andExpect(jsonPath("$.transactions", empty()));
     }
 }

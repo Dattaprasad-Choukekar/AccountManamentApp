@@ -1,5 +1,6 @@
 package org.example.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import org.example.model.Transaction;
 
 import java.util.Collections;
@@ -8,11 +9,18 @@ import java.util.Objects;
 
 public class AccountDto {
     private final String accountId;
+    private final String email;
     private final List<Transaction> transactions;
 
-    public AccountDto(String accountId, List<Transaction> transactions) {
+    @JsonCreator
+    public AccountDto(String accountId, String email, List<Transaction> transactions) {
         this.accountId = accountId;
+        this.email = email;
         this.transactions = transactions;
+    }
+
+    public AccountDto(String email, List<Transaction> transactions) {
+        this(null, email, transactions);
     }
 
     public String getAccountId() {
@@ -23,15 +31,19 @@ public class AccountDto {
         return Collections.unmodifiableList(transactions);
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        AccountDto account = (AccountDto) o;
-        return Objects.equals(accountId, account.accountId) && Objects.equals(transactions, account.transactions);
+        AccountDto that = (AccountDto) o;
+        return Objects.equals(accountId, that.accountId) && Objects.equals(email, that.email) && Objects.equals(transactions, that.transactions);
     }
 
-   /* @Override
+    @Override
     public int hashCode() {
-        return Objects.hash(accountId, transactions);
-    }*/
+        return Objects.hash(accountId, email, transactions);
+    }
 }
