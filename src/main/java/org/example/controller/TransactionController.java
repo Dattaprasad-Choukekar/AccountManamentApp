@@ -7,16 +7,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController("/transactions")
+@RestController("/transactions/")
 public class TransactionController {
 
-    @GetMapping("${id}")
+    @GetMapping("{id}")
     public Transaction getTransaction(@PathVariable int id) {
         return null;
     }
 
-    @GetMapping("${accountId}")
+   /* @GetMapping("{accountId}")
     public List<Transaction> getTransactions(@PathVariable int accountId) {
         return null;
-    }
+    }*/
 }

@@ -1,26 +1,34 @@
 package org.example.controller;
 
-import org.example.model.Account;
+import org.example.dto.AccountDto;
+import org.example.service.AccountService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController("/accounts/")
+@RestController
+@RequestMapping("/accounts")
 public class AccountController {
+    private AccountService accountService;
 
-    @GetMapping("${id}")
-    public Account getAccount(@PathVariable int id) {
-        return null;
+    public AccountController(AccountService accountService) {
+        this.accountService = accountService;
     }
 
-    @GetMapping()
-    public List<Account> getAccounts() {
-        return null;
+    @GetMapping("/{accountId}")
+    public AccountDto getAccount(@PathVariable String accountId) {
+        return accountService.getAccount(accountId);
     }
 
-    @PostMapping()
-    public ResponseEntity<Account> createAccount(@RequestBody Account account) {
-        return null;
+    @GetMapping
+    public List<AccountDto> getAccounts() {
+        return accountService.getAccounts();
+    }
+
+    @PostMapping
+    public ResponseEntity<AccountDto> createAccount(@RequestBody AccountDto account) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(account));
     }
 }
