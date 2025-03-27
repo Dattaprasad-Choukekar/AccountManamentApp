@@ -1,17 +1,21 @@
 package org.example.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Account {
     @Id
     @GeneratedValue
     private Long id;
+    @Column(unique = true)
     private String accountId;
+    @Column(unique = true)
     private String email;
-   // private List<Transaction> transactions = new ArrayList<>();
+    @OneToMany(mappedBy = "account")
+    private List<Transaction> transactions = new ArrayList<>();
 
     public Account() {
     }
@@ -41,11 +45,7 @@ public class Account {
         this.email = email;
     }
 
-/*    public List<Transaction> getTransactions() {
+    public List<Transaction> getTransactions() {
         return transactions;
     }
-
-    public void setTransactions(List<Transaction> transactions) {
-        this.transactions = transactions;
-    }*/
 }

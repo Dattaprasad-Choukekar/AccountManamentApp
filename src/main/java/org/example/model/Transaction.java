@@ -1,9 +1,7 @@
 package org.example.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -19,7 +17,9 @@ public class Transaction {
     @GeneratedValue
     private Long id;
     @ManyToOne
+    @NotNull
     private Account account;
+    @Column(unique = true)
     private String transactionId;
     private BigDecimal amount;
     private TransactionType type;
