@@ -3,6 +3,8 @@ package org.example.it;
 import org.example.dto.AccountDto;
 import org.example.dto.TransactionDto;
 import org.example.dto.TransactionType;
+import org.example.repository.AccountRepository;
+import org.example.repository.TransactionRepository;
 import org.example.service.AccountService;
 import org.example.service.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +42,12 @@ public class AccountApplicationIT {
     @Autowired
     private TransactionService transactionService;
 
+   /* @Autowired
+    private TransactionRepository transactionRepository;
+
+    @Autowired
+    private AccountRepository accountRepository;
+*/
     private AccountDto savedAccount;
     private TransactionDto savedTransaction;
     private static UUID uuid = mockUUID();
