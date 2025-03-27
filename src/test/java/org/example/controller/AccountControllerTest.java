@@ -77,4 +77,15 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.email", is(EMAIL)))
                 .andExpect(jsonPath("$.transactions", empty()));
     }
+
+    @Test
+    void createAccountInvalidEmail() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/accounts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":"abc","transactions":[]}
+                                """))
+               // .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
 }

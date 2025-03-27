@@ -1,6 +1,9 @@
 package org.example.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import org.example.model.Transaction;
 
 import java.util.ArrayList;
@@ -10,6 +13,8 @@ import java.util.Objects;
 
 public class AccountDto {
     private String accountId;
+    @NotBlank
+    @Email
     private String email;
     private List<Transaction> transactions = new ArrayList<>();
 
