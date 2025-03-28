@@ -7,6 +7,7 @@ import org.example.repository.AccountRepository;
 import org.example.repository.TransactionRepository;
 import org.example.service.AccountService;
 import org.example.service.TransactionService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -18,7 +19,6 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -34,7 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 @Testcontainers
 public class AccountApplicationIT {
     public static final String EMAIL = "test@email.com";
@@ -51,22 +50,23 @@ public class AccountApplicationIT {
     @Autowired
     private TransactionService transactionService;
 
-   /* @Autowired
+    @Autowired
     private TransactionRepository transactionRepository;
 
     @Autowired
     private AccountRepository accountRepository;
-*/
+
     private AccountDto savedAccount;
     private TransactionDto savedTransaction;
-    private static UUID uuid = mockUUID();
+    private static MockedStatic<UUID> UUID_MOCK;
+    private static UUID uuid;
 
     @DynamicPropertySource
-    static void configureTestProperties(DynamicPropertyRegistry registry){
+    static void configureTestProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", MYSQL_CONTAINER::getJdbcUrl);
         registry.add("spring.datasource.username", MYSQL_CONTAINER::getUsername);
         registry.add("spring.datasource.password", MYSQL_CONTAINER::getPassword);
-        registry.add("spring.jpa.hibernate.ddl-auto",() -> "create");
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create");
     }
 
     @BeforeEach
@@ -76,6 +76,13 @@ public class AccountApplicationIT {
         savedTransaction = transactionService
                 .createTransaction(new TransactionDto(savedAccount.getAccountId(), null, BigDecimal.TEN,
                         TransactionType.DEBIT));
+        uuid = mockUUID();
+    }
+
+    @AfterEach
+    void tearDown() {
+        transactionRepository.deleteAll();
+        accountRepository.deleteAll();
     }
 
     @Test
@@ -83,27 +90,27 @@ public class AccountApplicationIT {
         mockMvc.perform(MockMvcRequestBuilders.post("/accounts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"email":"test@email.com"}
+                                {"email":"test1@email.com"}
                                 """))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.accountId", is(uuid.toString())))
-                .andExpect(jsonPath("$.email", is(EMAIL)))
+                .andExpect(jsonPath("$.email", is("test1@email.com")))
                 .andExpect(jsonPath("$.transactions", empty()));
     }
 
     @Test
     void getAccountsTest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/accounts"))
-                //.andDo(print())
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].accountId", is(savedAccount.getAccountId())))
                 .andExpect(jsonPath("$[0].email", is(EMAIL)))
-                .andExpect(jsonPath("$[0].transactions", empty()));
+                .andExpect(jsonPath("$[0].transactions", hasSize(1)));
     }
 
     @Test
@@ -115,7 +122,7 @@ public class AccountApplicationIT {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.accountId", is(accountId)))
                 .andExpect(jsonPath("$.email", is(EMAIL)))
-                .andExpect(jsonPath("$.transactions", empty()));
+                .andExpect(jsonPath("$.transactions", hasSize(1)));
     }
 
     @Test
@@ -149,7 +156,7 @@ public class AccountApplicationIT {
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].accountId", is(savedAccount.getAccountId())))
                 .andExpect(jsonPath("$[0].transactionId", is(savedTransaction.getTransactionId())))
-                .andExpect(jsonPath("$[0].amount", is(savedTransaction.getAmount().intValue())))
+                .andExpect(jsonPath("$[0].amount", is(savedTransaction.getAmount().doubleValue())))
                 .andExpect(jsonPath("$[0].type", is(savedTransaction.getType().toString())));
     }
 
@@ -161,14 +168,15 @@ public class AccountApplicationIT {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.accountId", is(savedTransaction.getAccountId())))
                 .andExpect(jsonPath("$.transactionId", is(savedTransaction.getTransactionId())))
-                .andExpect(jsonPath("$.amount", is(savedTransaction.getAmount().intValue())))
+                .andExpect(jsonPath("$.amount", is(savedTransaction.getAmount().doubleValue())))
                 .andExpect(jsonPath("$.type", is(savedTransaction.getType().toString())));
     }
 
     private static UUID mockUUID() {
+        if (UUID_MOCK != null) UUID_MOCK.close();
         UUID uuid = UUID.randomUUID();
-        MockedStatic<UUID> mocked = mockStatic(UUID.class);
-        mocked.when(UUID::randomUUID).thenReturn(uuid);
+        UUID_MOCK = mockStatic(UUID.class);
+        UUID_MOCK.when(UUID::randomUUID).thenReturn(uuid);
         return uuid;
     }
 }
