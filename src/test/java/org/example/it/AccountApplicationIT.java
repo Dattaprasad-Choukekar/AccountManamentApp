@@ -14,9 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -30,8 +35,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@Testcontainers
 public class AccountApplicationIT {
     public static final String EMAIL = "test@email.com";
+
+    @Container
+    static final MySQLContainer<?> MYSQL_CONTAINER = new MySQLContainer<>("mysql:latest");
 
     @Autowired
     private MockMvc mockMvc;
@@ -51,6 +60,14 @@ public class AccountApplicationIT {
     private AccountDto savedAccount;
     private TransactionDto savedTransaction;
     private static UUID uuid = mockUUID();
+
+    @DynamicPropertySource
+    static void configureTestProperties(DynamicPropertyRegistry registry){
+        registry.add("spring.datasource.url", MYSQL_CONTAINER::getJdbcUrl);
+        registry.add("spring.datasource.username", MYSQL_CONTAINER::getUsername);
+        registry.add("spring.datasource.password", MYSQL_CONTAINER::getPassword);
+        registry.add("spring.jpa.hibernate.ddl-auto",() -> "create");
+    }
 
     @BeforeEach
     void setUp() {
